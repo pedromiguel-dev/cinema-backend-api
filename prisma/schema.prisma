@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String
+  password  String
+  isAdmin   Boolean
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Seat      Seat[]
+  Sessions  Session[]
+}
+
+model Movies {
+  id          String    @id @default(uuid())
+  image       String
+  title       String    @unique
+  description String
+  Duration    Int
+  Sessions    Session[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  startDate    DateTime
+  startSession DateTime
+  endSession   DateTime
+  ticketPrice  Float
+  is3D         Boolean
+  Movie        Movies   @relation(fields: [movieId], references: [id])
+  movieId      String
+  Theatre      Theatre?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  Users        User[]
+}
+
+model Theatre {
+  id        String  @id @default(uuid())
+  name      String
+  seats     Seat[]
+  session   Session @relation(fields: [sessionId], references: [id])
+  sessionId String  @unique
+}
+
+model Seat {
+  id            Int     @id @default(autoincrement())
+  accessibility Boolean
+  Theatre       Theatre @relation(fields: [theatreId], references: [id])
+  theatreId     String
+  ocupiedByUser User    @relation(fields: [userId], references: [id])
+  userId        String
+}
