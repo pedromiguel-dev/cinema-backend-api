@@ -1,29 +1,36 @@
-const { format } = require("date-fns");
-const { v4: uuid } = require("uuid");
+import { Request, Response, NextFunction } from "express";
+import { format } from "date-fns";
+import { v4 as uuid } from "uuid";
 
-const fs = require("fs");
+import fs from "fs";
 const fsPromisses = require("fs").promises;
-const path = require("path");
+import path from "path";
 
-const logEvents = async (message, logName) => {
+const logEvents = async (message: string, logName: string) => {
   const dateTime = `${format(new Date(), "ddMMyyyy\tHH:mm:ss")}`;
+  //log itself
   const logItem = `${dateTime}\t${uuid()}\t${message}\n`;
   console.log(logItem);
 
   try {
+    //create if not exists
     if (!fs.existsSync(path.join(__dirname, "..", "logs"))) {
       await fsPromisses.mkdir(path.join(__dirname, "..", "logs"));
     }
+    //write log into the logname
     await fsPromisses.appendFile(path.join(__dirname, "..", "logs", logName), logItem);
   } catch (error) {
     console.log(error);
   }
 };
 
-const logger = (req, res, next) => {
+//middleware logger, for visits
+const logger = (req: Request, res: Response, next: NextFunction) => {
   logEvents(`${req.method}\t${req.headers.origin}\t${req.url}`, "reqLog.txt");
   console.log(`${req.method}\t${req.headers.origin}\t${req.url}`);
   next();
 };
 
-module.exports = { logger, logEvents };
+const logEventsController = { logger, logEvents };
+
+export default logEventsController;
