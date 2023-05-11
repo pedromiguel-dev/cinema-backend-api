@@ -18,7 +18,7 @@ app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use("/", rootRouterV1);
+app.use("^/api/v1", rootRouterV1);
 // app.use("^/$", require("./routes/api/v1/users"));
 // app.use("^/seats$", require("./routes/api/v1/seats"));
 // app.use("^/theatres$", require("./routes/api/v1/theatre"));

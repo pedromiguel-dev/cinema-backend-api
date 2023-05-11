@@ -5,9 +5,7 @@ const usersRouter = express.Router();
 usersRouter
   .route("^/$")
   .get(usersController.getAllUsers)
-  .post((req: Request, res: Response) => {
-    res.send("Empregados post");
-  });
+  .post(usersController.verifyUserCredencialsMiddleware, usersController.registerUser);
 
 usersRouter.route("^/:id").get((req: Request, res: Response) => {
   res.send("Empregado " + req.params.id);
