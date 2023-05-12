@@ -13,15 +13,16 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  name      String
-  password  String
-  isAdmin   Boolean
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Seat      Seat[]
-  Sessions  Session[]
+  id           String    @id @default(uuid())
+  email        String    @unique
+  name         String
+  password     String
+  isAdmin      Boolean
+  refreshToken String    @default("")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  Seat         Seat[]
+  Sessions     Session[]
 }
 
 model Movies {

@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import prisma from "../prisma/cleint";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv/config";
 
 const verifyLoginCredencialsMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const { name, email, password } = req.body;
@@ -28,8 +30,25 @@ const handleLogin = async (req: Request, res: Response) => {
   const match = await bcrypt.compare(password, userFound.password);
 
   if (match) {
-    //TODO: create JWTs
-    return res.json({ success: `User ${name} is logged in!` });
+    //creating jwt
+    if (!process.env.ACCESS_TOKEN_SECRET) return res.sendStatus(403);
+    if (!process.env.REFRESH_TOKEN_SECRET) return res.sendStatus(403);
+
+    const accessToken = jwt.sign({ name: name }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "30s" });
+    const refreshToken = jwt.sign({ name: name }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "1d" });
+
+    //save refresh token in database
+    const user = await prisma.user.update({
+      data: {
+        refreshToken,
+      },
+      where: {
+        id: userFound.id,
+      },
+    });
+
+    res.cookie("jwt", refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+    res.json([{ success: `User ${name} is logged in!` }, { accessToken }]);
   } else {
     res.status(401).json({ message: "Credencials may be incorrect." });
   }
