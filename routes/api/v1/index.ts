@@ -5,13 +5,23 @@ import usersRouter from "./users";
 import seatsRouter from "./seats";
 import theatresRouter from "./theatre";
 import sessionsRouter from "./sessions";
+import authRouter from "./auth";
+import verifyJWT from "../../../middleware/verifyJWT";
+import refreshRouter from "./auth/refresh";
+import logoutRouter from "./auth/logout";
 //root
 const rootRouterV1 = express.Router();
 
-rootRouterV1.use("^/$", usersRouter);
+rootRouterV1.use("^/register$", usersRouter);
+rootRouterV1.use("^/auth$", authRouter);
+rootRouterV1.use("^/logout$", logoutRouter);
+rootRouterV1.use("^/refresh$", refreshRouter);
+rootRouterV1.use("^/movies$", moviesRouter);
+
+rootRouterV1.use(verifyJWT);
+
 rootRouterV1.use("^/seats$", seatsRouter);
 rootRouterV1.use("^/theatres$", theatresRouter);
-rootRouterV1.use("^/movies$", moviesRouter);
 rootRouterV1.use("^/sessions$", sessionsRouter);
 
 export default rootRouterV1;
