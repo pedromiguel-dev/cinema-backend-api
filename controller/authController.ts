@@ -7,7 +7,7 @@ import dotenv from "dotenv/config";
 const verifyLoginCredencialsMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const { name, email, password } = req.body;
   if (!name || !email || !password) {
-    return res.status(400).json({ error: "Please fill all the fields" });
+    return res.status(401).json({ error: "Please fill all the fields" });
   }
 
   //verify if the email is valid
@@ -47,7 +47,7 @@ const handleLogin = async (req: Request, res: Response) => {
       },
     });
 
-    res.cookie("jwt", refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+    res.cookie("jwt", refreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 });
     res.json([{ success: `User ${name} is logged in!` }, { accessToken }]);
   } else {
     res.status(401).json({ message: "Credencials may be incorrect." });

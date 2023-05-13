@@ -6,11 +6,13 @@ import corsOptions from "./config/corsOptions";
 import logEventsController from "./middleware/logEvents";
 import errorHandler from "./middleware/errorHandler";
 import cookieParser from "cookie-parser";
+import credentials from "./middleware/credentials";
 
 const app = express();
 
 const PORT = process.env.PORT || 8080;
 
+app.use(credentials);
 //custom middleware logger
 app.use(logEventsController.logger);
 

@@ -16,7 +16,7 @@ const handleLogout = async (req: Request, res: Response) => {
   });
 
   if (!userFound) {
-    res.clearCookie("jwt", { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+    res.clearCookie("jwt", { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 });
     return res.sendStatus(204);
   }
 
@@ -32,7 +32,7 @@ const handleLogout = async (req: Request, res: Response) => {
     },
   });
 
-  res.clearCookie("jwt", { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }); //secure true -- only serves on https
+  res.clearCookie("jwt", { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 }); //secure true -- only serves on https
   return res.sendStatus(204);
 };
 
