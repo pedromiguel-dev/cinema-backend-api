@@ -3,7 +3,7 @@ import prisma from "../prisma/cleint";
 import bcrypt from "bcrypt";
 
 const getAllUsers = async (req: Request, res: Response) => {
-  const users = await prisma.user.findMany();
+  const users = await prisma.user.findMany({ include: { role: true } });
   res.json(users);
 };
 
@@ -37,10 +37,11 @@ const registerUser = async (req: Request, res: Response) => {
         name,
         email,
         password: hashedPassword,
-        isAdmin: false,
+        role: {
+          connect: [{ id: 30 }, { id: 200 }],
+        },
       },
     });
-    console.log(user);
     return res.status(201).json({ success: `New user ${name} created.` });
   } catch (error: any) {
     console.log(error);

@@ -41,3 +41,21 @@ content-type: application/json
     "name": "pedromiguel-dev",
     "password": "senhasegura123"
 }
+### verifying jwt
+GET http://localhost:8080/api/v1/seats
+content-type: application/json
+
+{
+    "email": "pedro.miguel@gmail.com",
+    "name": "pedromiguel-dev",
+    "password": "senhasegura123"
+}
+### verifying jwt
+POST http://localhost:8080/api/v1/register
+content-type: application/json
+
+{
+    "email": "p@gmail.com",
+    "name": "pedromiguel",
+    "password": "123456789"
+}

@@ -13,19 +13,22 @@ const handleRefreshToken = async (req: Request, res: Response) => {
     where: {
       refreshToken,
     },
+    include: {
+      role: true,
+    },
   });
   if (!userFound) return res.status(403);
 
-  if (!process.env.ACCESS_TOKEN_SECRET) return res.sendStatus(403);
   if (!process.env.REFRESH_TOKEN_SECRET) return res.sendStatus(403);
 
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err: any, decoded: any) => {
     if (!process.env.ACCESS_TOKEN_SECRET) return res.sendStatus(403);
-    if (!process.env.REFRESH_TOKEN_SECRET) return res.sendStatus(403);
 
     if (err || userFound.name !== decoded.name) return res.sendStatus(403);
-
-    const accessToken = jwt.sign({ name: decoded.name }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "10s" });
+    const roles = userFound.role;
+    const accessToken = jwt.sign({ user_info: { name: decoded.name, roles } }, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: "10s",
+    });
     return res.json({ accessToken });
   });
 };

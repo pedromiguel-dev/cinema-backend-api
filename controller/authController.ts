@@ -24,17 +24,23 @@ const handleLogin = async (req: Request, res: Response) => {
     where: {
       name,
     },
+    include: {
+      role: true,
+    },
   });
   if (!userFound) return res.status(401).json({ error: "User not found" });
 
   const match = await bcrypt.compare(password, userFound.password);
 
   if (match) {
+    //define roles
+    const roles = userFound.role;
+
     //creating jwt
     if (!process.env.ACCESS_TOKEN_SECRET) return res.sendStatus(403);
     if (!process.env.REFRESH_TOKEN_SECRET) return res.sendStatus(403);
 
-    const accessToken = jwt.sign({ name: name }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "30s" });
+    const accessToken = jwt.sign({ user_info: { name: name, roles } }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "30s" });
     const refreshToken = jwt.sign({ name: name }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "1d" });
 
     //save refresh token in database
