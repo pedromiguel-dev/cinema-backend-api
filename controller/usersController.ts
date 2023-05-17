@@ -14,7 +14,7 @@ const verifyUserCredencialsMiddleware = async (req: Request, res: Response, next
   }
 
   //verify if the email is valid
-  const emailRegex = /\S+@\S+\.\S+/;
+  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
   if (!emailRegex.test(email)) return res.status(400).json({ error: "Please enter a valid email" });
 
   const duplicateEmailOrUser = await prisma.user.findFirst({
@@ -38,7 +38,7 @@ const registerUser = async (req: Request, res: Response) => {
         email,
         password: hashedPassword,
         role: {
-          connect: [{ id: 30 }, { id: 200 }],
+          connect: [{ id: 200 }],
         },
       },
     });

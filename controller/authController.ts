@@ -5,8 +5,8 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv/config";
 
 const verifyLoginCredencialsMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) {
+  const { email, password } = req.body;
+  if (!email || !password) {
     return res.status(401).json({ error: "Please fill all the fields" });
   }
 
@@ -17,12 +17,12 @@ const verifyLoginCredencialsMiddleware = async (req: Request, res: Response, nex
 };
 
 const handleLogin = async (req: Request, res: Response) => {
-  const { name, password } = req.body;
+  const { email, password } = req.body;
 
   //eval password
   const userFound = await prisma.user.findFirst({
     where: {
-      name,
+      email,
     },
     include: {
       role: true,
@@ -40,8 +40,10 @@ const handleLogin = async (req: Request, res: Response) => {
     if (!process.env.ACCESS_TOKEN_SECRET) return res.sendStatus(403);
     if (!process.env.REFRESH_TOKEN_SECRET) return res.sendStatus(403);
 
-    const accessToken = jwt.sign({ user_info: { name: name, roles } }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "30s" });
-    const refreshToken = jwt.sign({ name: name }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "1d" });
+    const accessToken = jwt.sign({ user_info: { name: userFound.email, roles } }, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: "5m",
+    });
+    const refreshToken = jwt.sign({ name: userFound.email }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "1h" });
 
     //save refresh token in database
     const user = await prisma.user.update({
@@ -54,9 +56,9 @@ const handleLogin = async (req: Request, res: Response) => {
     });
 
     res.cookie("jwt", refreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 });
-    res.json([{ success: `User ${name} is logged in!` }, { accessToken }]);
+    res.json([{ roles, accessToken }]);
   } else {
-    res.status(401).json({ message: "Credencials may be incorrect." });
+    res.status(401).json({ error: "Credencials may be incorrect." });
   }
 };
 
