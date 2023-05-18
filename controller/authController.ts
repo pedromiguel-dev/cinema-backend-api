@@ -2,9 +2,11 @@ import { NextFunction, Request, Response } from "express";
 import prisma from "../prisma/cleint";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv/config";
+import dotenv from "dotenv";
 
-const verifyLoginCredencialsMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+dotenv.config({path: '.env'})
+
+const verifyLoginCredentialsMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res.status(401).json({ error: "Please fill all the fields" });
@@ -31,7 +33,6 @@ const handleLogin = async (req: Request, res: Response) => {
   if (!userFound) return res.status(401).json({ error: "User not found" });
 
   const match = await bcrypt.compare(password, userFound.password);
-
   if (match) {
     //define roles
     const roles = userFound.role;
@@ -63,7 +64,7 @@ const handleLogin = async (req: Request, res: Response) => {
 };
 
 const authController = {
-  verifyLoginCredencialsMiddleware,
+  verifyLoginCredentialsMiddleware,
   handleLogin,
 };
 

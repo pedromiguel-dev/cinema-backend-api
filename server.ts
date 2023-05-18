@@ -10,13 +10,13 @@ import credentials from "./middleware/credentials";
 
 const app = express();
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8090;
 
 app.use(credentials);
 //custom middleware logger
 app.use(logEventsController.logger);
 
-//cros origin resouse sharing
+//cross-origin resource sharing
 app.use(cors(corsOptions));
 
 app.use(express.urlencoded({ extended: true }));
