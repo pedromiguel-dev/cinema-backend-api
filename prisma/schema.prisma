@@ -45,9 +45,9 @@ model Movies {
 
 model Session {
   id           String   @id @default(uuid())
-  startDate    DateTime
-  startSession DateTime
-  endSession   DateTime
+  startDate    DateTime @default(now())
+  startSession DateTime @default(now())
+  endSession   DateTime @default(now())
   ticketPrice  Float
   is3D         Boolean
   Movie        Movies   @relation(fields: [movieId], references: [id])
